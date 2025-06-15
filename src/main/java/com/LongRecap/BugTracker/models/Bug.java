@@ -1,18 +1,15 @@
 package com.LongRecap.BugTracker.models;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Data
 @Table(name = "lr_bug_master")
 public class Bug {
 
@@ -21,32 +18,25 @@ public class Bug {
     private Long id;
 
     private String title;
-
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private String status;
+    private Status status;
 
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
-
     @PrePersist
-    public void onCreate(){
+    public void onCreate() {
         this.createdAt = LocalDateTime.now();
     }
 
     @PreUpdate
-    public void onUpdate(){
+    public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 
     public enum Status {
-
-        OPEN,
-        CLOSED,
-        IN_PROGRESS
-
+        OPEN, IN_PROGRESS, CLOSED
     }
 }

@@ -14,7 +14,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BugServiceImpl implements BugService {
 
-    private final BugRepository bugRepository;
+    private BugRepository bugRepository;
+
+    public void setBugRepository(BugRepository bugRepository){
+        this.bugRepository = bugRepository;
+    }
 
     @Override
     public Bug createBug(Bug bug) {
@@ -37,13 +41,13 @@ public class BugServiceImpl implements BugService {
     }
 
     @Override
-    public Bug updateBug(Long id, Bug bug) {
+    public Bug updateBug(Long id, Bug updatedBug) {
         Bug extistingBug = bugRepository.findById(id).orElseThrow(()->
                 new EntityNotFoundException("Bug not found in the system with id {} " + id ));
 
-        extistingBug.setDescription(bug.getDescription());
-        extistingBug.setTitle(bug.getTitle());
-        extistingBug.setStatus(bug.getStatus());
+        extistingBug.setDescription(updatedBug.getDescription());
+        extistingBug.setTitle(updatedBug.getTitle());
+        extistingBug.setStatus(updatedBug.getStatus());
 
         return bugRepository.save(extistingBug);
     }
