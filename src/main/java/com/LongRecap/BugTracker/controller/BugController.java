@@ -1,13 +1,19 @@
 package com.LongRecap.BugTracker.controller;
 
+import com.LongRecap.BugTracker.dto.BugMapper;
+import com.LongRecap.BugTracker.dto.BugRequestDTO;
+import com.LongRecap.BugTracker.dto.BugResponseDTO;
 import com.LongRecap.BugTracker.models.Bug;
 import com.LongRecap.BugTracker.service.BugService;
+import jakarta.validation.Valid;
 import lombok.Lombok;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/bugs")
@@ -21,33 +27,48 @@ public class BugController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Bug> createBug(@RequestBody Bug bug){
-        return ResponseEntity.ok(bugService.createBug(bug));
+    public ResponseEntity<BugResponseDTO> createBug(@Valid @RequestBody BugRequestDTO bugRequestDTO){
+        Bug created = bugService.createBug(BugMapper.toEntity(bugRequestDTO));
+        return ResponseEntity.ok(BugMapper.toDTO(created));
 
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Bug> getBugById( @PathVariable  Long id){
+    public ResponseEntity<BugResponseDTO> getBugById( @PathVariable  Long id){
 
         return bugService.getBugById(id)
+                .map(BugMapper :: toDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/")
-    public ResponseEntity<List<Bug>> getAllBugs(){
-        return ResponseEntity.ok(bugService.getAllBugs());
+    public ResponseEntity<List<BugResponseDTO>> getAllBugs(){
+
+        List<BugResponseDTO> list = bugService.getAllBugs().stream()
+                .map(BugMapper :: toDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<Bug>> getBugByStatus(@PathVariable Bug.Status status){
-        return ResponseEntity.ok(bugService.getBugByStatus(status));
+    public ResponseEntity<List<BugResponseDTO>> getBugByStatus(@PathVariable Bug.Status status){
+        List<BugResponseDTO> list = bugService.getBugByStatus(status).stream()
+                .map(BugMapper :: toDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(list);
     }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<Bug> updateBug(@PathVariable Long id, @RequestBody Bug bug){
-        return ResponseEntity.ok(bugService.updateBug(id,bug));
+    public ResponseEntity<BugResponseDTO> updateBug(@PathVariable Long id,
+                                         @RequestBody BugRequestDTO bugRequestDTO){
+
+        Bug updatedBug = bugService.updateBug(id,BugMapper.toEntity(bugRequestDTO));
+
+        return ResponseEntity.ok(BugMapper.toDTO(updatedBug));
 
     }
 
